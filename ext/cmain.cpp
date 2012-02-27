@@ -643,6 +643,30 @@ extern "C" int evma_set_pending_connect_timeout (const unsigned long binding, fl
 }
 
 
+/**************************
+evma_get_backpressure_level
+***************************/
+
+extern "C" int evma_get_backpressure_level (const unsigned long binding)
+{
+  ensure_eventmachine("evma_get_backpressure_level");
+  EventableDescriptor *ed = dynamic_cast <EventableDescriptor*> (Bindable_t::GetObject (binding));
+  return ed ? ed->GetBackPressureLevel() : 0;
+}
+
+
+/**************************
+evma_set_backpressure_level
+***************************/
+
+extern "C" int evma_set_backpressure_level (const unsigned long binding, int level)
+{
+  ensure_eventmachine("evma_set_backpressure_level");
+  EventableDescriptor *ed = dynamic_cast <EventableDescriptor*> (Bindable_t::GetObject (binding));
+  return ed ? ed->SetBackPressureLevel(level) : 0;
+}
+
+
 /**********************
 evma_set_timer_quantum
 **********************/

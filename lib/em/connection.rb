@@ -724,5 +724,17 @@ module EventMachine
     def paused?
       EventMachine::connection_paused? @signature
     end
+
+    # ibc
+    # TODO: doc
+    def backpressure_level= level
+      EventMachine::set_backpressure_level @signature, level
+    end
+
+    # TODO: doc
+    def backpressure_level
+      EventMachine::get_backpressure_level @signature
+    end
+
   end
 end

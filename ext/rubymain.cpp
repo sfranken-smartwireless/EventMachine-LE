@@ -465,6 +465,27 @@ static VALUE t_set_pending_connect_timeout (VALUE self, VALUE signature, VALUE t
 	return Qfalse;
 }
 
+
+/*****************************
+t_get_backpressure_level
+*****************************/
+
+static VALUE t_get_backpressure_level (VALUE self, VALUE signature)
+{
+  return INT2NUM(evma_get_backpressure_level(NUM2ULONG(signature)));
+}
+
+
+/*****************************
+t_set_backpressure_level
+*****************************/
+
+static VALUE t_set_backpressure_level (VALUE self, VALUE signature, VALUE level)
+{
+  return INT2NUM(evma_set_backpressure_level(NUM2ULONG(signature), NUM2INT(level)));
+}
+
+
 /***************
 t_send_datagram
 ***************/
@@ -1239,6 +1260,8 @@ extern "C" void Init_rubyeventmachine()
 	rb_define_module_function (EmModule, "set_pending_connect_timeout", (VALUE(*)(...))t_set_pending_connect_timeout, 2);
 	rb_define_module_function (EmModule, "set_rlimit_nofile", (VALUE(*)(...))t_set_rlimit_nofile, 1);
 	rb_define_module_function (EmModule, "get_connection_count", (VALUE(*)(...))t_get_connection_count, 0);
+        rb_define_module_function (EmModule, "get_backpressure_level", (VALUE(*)(...))t_get_backpressure_level, 1);
+        rb_define_module_function (EmModule, "set_backpressure_level", (VALUE(*)(...))t_set_backpressure_level, 2);
 
 	rb_define_module_function (EmModule, "epoll", (VALUE(*)(...))t__epoll, 0);
 	rb_define_module_function (EmModule, "epoll=", (VALUE(*)(...))t__epoll_set, 1);

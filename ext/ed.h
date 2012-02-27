@@ -80,6 +80,8 @@ class EventableDescriptor: public Bindable_t
 		virtual int SetCommInactivityTimeout (uint64_t value) {return 0;}
 		uint64_t GetPendingConnectTimeout();
 		int SetPendingConnectTimeout (uint64_t value);
+                int GetBackPressureLevel();
+                int SetBackPressureLevel(int level);
 
 		#ifdef HAVE_EPOLL
 		struct epoll_event *GetEpollEvent() { return &EpollEvent; }
@@ -128,6 +130,7 @@ class EventableDescriptor: public Bindable_t
 		EventMachine_t *MyEventMachine;
 		uint64_t PendingConnectTimeout;
 		uint64_t InactivityTimeout;
+                int BackPressureLevel;
 		uint64_t LastActivity;
 		uint64_t NextHeartbeat;
 		bool bPaused;

@@ -66,6 +66,7 @@ EventableDescriptor::EventableDescriptor (int sd, EventMachine_t *em, bool autoc
 	MyEventMachine (em),
 	PendingConnectTimeout(20000000),
 	InactivityTimeout (0),
+	BackPressureLevel(32768),  // Default value.
 	bPaused (false)
 {
 	/* There are three ways to close a socket, all of which should
@@ -335,6 +336,28 @@ int EventableDescriptor::SetPendingConnectTimeout (uint64_t value)
 		return 1;
 	}
 	return 0;
+}
+
+
+/****************************************
+EventableDescriptor::GetBackPressureLevel
+*****************************************/
+
+int EventableDescriptor::GetBackPressureLevel()
+{
+  return BackPressureLevel;
+}
+
+
+/****************************************
+EventableDescriptor::SetBackPressureLevel
+*****************************************/
+
+int EventableDescriptor::SetBackPressureLevel(int level)
+{
+  // TODO: check value, but better in rubymain.cpp or connection.rb.
+  BackPressureLevel = level;
+  return level;
 }
 
 
@@ -648,6 +671,14 @@ bool ConnectionDescriptor::SelectForRead()
     return false;
   else if (bWatchOnly)
     return bNotifyReadable ? true : false;
+  // TODO: When this occurs, the connection remains open but it's not closed after comm_inactivity_timeout value.
+  // TODO: When this occurs, the connection does not read data anymore.
+  // Explanation by Aman: The other edge case this introduces is that dead connections will not be discovered,
+  // as the reactor never attempts a read() and thus never realizes that the other end has terminated the connection.
+  else if (GetOutboundDataSize() > BackPressureLevel) {
+    //printf("******* GetOutboundDataSize() > BackPressureLevel !!!!!!\n");
+    return false;
+  }
   else
     return true;
 }
