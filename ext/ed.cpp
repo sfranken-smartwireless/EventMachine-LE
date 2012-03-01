@@ -1410,7 +1410,11 @@ void AcceptorDescriptor::Read()
 	socklen_t addrlen = sizeof (pin);
 
 	for (int i=0; i < 10; i++) {
-		int sd = accept (GetSocket(), (struct sockaddr*)&pin, &addrlen);
+#ifdef HAVE_SOCK_CLOEXEC
+                int sd = EM_ACCEPT(GetSocket(), (struct sockaddr*)&pin, &addrlen, EM_CLOEXEC);
+#else
+                int sd = EM_ACCEPT(GetSocket(), (struct sockaddr*)&pin, &addrlen);
+#endif
 		if (sd == INVALID_SOCKET) {
 			// This breaks the loop when we've accepted everything on the kernel queue,
 			// up to 10 new connections. But what if the *first* accept fails?
