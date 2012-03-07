@@ -1410,11 +1410,7 @@ void AcceptorDescriptor::Read()
 	socklen_t addrlen = sizeof (pin);
 
 	for (int i=0; i < 10; i++) {
-#ifdef SOCK_CLOEXEC
-                int sd = EM_ACCEPT(GetSocket(), (struct sockaddr*)&pin, &addrlen, EM_CLOEXEC);
-#else
                 int sd = EM_ACCEPT(GetSocket(), (struct sockaddr*)&pin, &addrlen);
-#endif
 		if (sd == INVALID_SOCKET) {
 			// This breaks the loop when we've accepted everything on the kernel queue,
 			// up to 10 new connections. But what if the *first* accept fails?
@@ -1422,7 +1418,8 @@ void AcceptorDescriptor::Read()
 			// described in the note above?
 			break;
 		}
-
+// If we have accept(4) then it has been called with SOCK_NONBLOCK so we don't need to set it again.
+#ifndef HAVE_ACCEPT4
 		// Set the newly-accepted socket non-blocking.
 		// On Windows, this may fail because, weirdly, Windows inherits the non-blocking
 		// attribute that we applied to the acceptor socket into the accepted one.
@@ -1433,7 +1430,7 @@ void AcceptorDescriptor::Read()
 			close (sd);
 			continue;
 		}
-
+#endif
 
 		// Disable slow-start (Nagle algorithm). Eventually make this configurable.
 		int one = 1;

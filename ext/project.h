@@ -114,9 +114,9 @@ using namespace std;
 #endif
 
 #ifdef HAVE_ACCEPT4
-#define EM_ACCEPT accept4
+#define EM_ACCEPT(sockfd, addr, addrlen) accept4(sockfd, addr, addrlen, SOCK_NONBLOCK|SOCK_CLOEXEC)
 #else
-#define EM_ACCEPT accept
+#define EM_ACCEPT(sockfd, addr, addrlen) accept(sockfd, addr, addrlen)
 #endif
 
 #ifdef HAVE_EPOLL
