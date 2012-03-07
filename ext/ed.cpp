@@ -1418,7 +1418,7 @@ void AcceptorDescriptor::Read()
 			// described in the note above?
 			break;
 		}
-// If we have accept(4) then it has been called with SOCK_NONBLOCK so we don't need to set it again.
+// If we have accept4 then it has been called with SOCK_NONBLOCK so we don't need to set it again.
 #ifndef HAVE_ACCEPT4
 		// Set the newly-accepted socket non-blocking.
 		// On Windows, this may fail because, weirdly, Windows inherits the non-blocking
