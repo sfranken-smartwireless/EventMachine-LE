@@ -132,8 +132,7 @@ when /darwin/
 
 when /linux/
   add_define 'HAVE_EPOLL' if have_func('epoll_create', 'sys/epoll.h')
-  add_define 'HAVE_ACCEPT4'
-  add_define 'HAVE_SOCK_CLOEXEC'
+  have_func('accept4', %w(sys/socket.h))
 
   # on Unix we need a g++ link, not gcc.
   CONFIG['LDSHARED'] = "$(CXX) -shared"

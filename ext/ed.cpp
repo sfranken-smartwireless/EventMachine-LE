@@ -1410,7 +1410,7 @@ void AcceptorDescriptor::Read()
 	socklen_t addrlen = sizeof (pin);
 
 	for (int i=0; i < 10; i++) {
-#ifdef HAVE_SOCK_CLOEXEC
+#ifdef SOCK_CLOEXEC
                 int sd = EM_ACCEPT(GetSocket(), (struct sockaddr*)&pin, &addrlen, EM_CLOEXEC);
 #else
                 int sd = EM_ACCEPT(GetSocket(), (struct sockaddr*)&pin, &addrlen);

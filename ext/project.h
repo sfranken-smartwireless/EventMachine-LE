@@ -107,7 +107,7 @@ using namespace std;
 #include <openssl/err.h>
 #endif
 
-#ifdef HAVE_SOCK_CLOEXEC
+#ifdef SOCK_CLOEXEC
 #define EM_CLOEXEC SOCK_CLOEXEC
 #else
 #define EM_CLOEXEC 0
