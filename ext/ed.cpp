@@ -1150,7 +1150,7 @@ void ConnectionDescriptor::StartTls()
 ConnectionDescriptor::SetTlsParms
 *********************************/
 
-void ConnectionDescriptor::SetTlsParms (const char *privkey_filename, const char *certchain_filename, bool verify_peer, int ssl_version, const char *cipherlist)
+void ConnectionDescriptor::SetTlsParms (const char *privkey_filename, const char *certchain_filename, bool verify_peer, int ssl_version, const char *cipherlist, int is_server)
 {
 	#ifdef WITH_SSL
 	if (SslBox)
@@ -1163,6 +1163,8 @@ void ConnectionDescriptor::SetTlsParms (const char *privkey_filename, const char
         bSslVersion = ssl_version;
         if (cipherlist && *cipherlist)
           CipherList = cipherlist;
+        if (is_server)
+          bIsServer = is_server > 0;
 	#endif
 
 	#ifdef WITHOUT_SSL

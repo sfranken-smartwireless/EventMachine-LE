@@ -397,6 +397,8 @@ module EventMachine
     #
     # @option args [String] :cipher_list ("ALL:!ADH:!LOW:!EXP:!DES-CBC3-SHA:@STRENGTH")   indicates the available SSL cipher values. Default value is "ALL:!ADH:!LOW:!EXP:!DES-CBC3-SHA:@STRENGTH". Check the format of the OpenSSL cipher string at http://www.openssl.org/docs/apps/ciphers.html#CIPHER_LIST_FORMAT.
     #
+    # @option args [Boolean] :server (nil)    if given, override the heuristic whether we are TLS client or TLS server.  (If not given, we are TLS server iff we are TCP server.)
+    #
     # @example Using TLS with EventMachine
     #
     #  require 'rubygems'
@@ -421,7 +423,7 @@ module EventMachine
     #
     # @see #ssl_verify_peer
     def start_tls args={}
-      priv_key, cert_chain, verify_peer, ssl_version, cipher_list = args.values_at(:private_key_file, :cert_chain_file, :verify_peer, :ssl_version, :cipher_list)
+      priv_key, cert_chain, verify_peer, ssl_version, cipher_list, is_server = args.values_at(:private_key_file, :cert_chain_file, :verify_peer, :ssl_version, :cipher_list, :server)
 
       [priv_key, cert_chain].each do |file|
         next if file.nil? or file.empty?
@@ -440,7 +442,13 @@ module EventMachine
         else         ; raise "invalid value #{ssl_version.inspect} for :ssl_version"
       end
 
-      EventMachine::set_tls_parms(@signature, priv_key || '', cert_chain || '', verify_peer, ssl_version, cipher_list || '')
+      is_server = case is_server
+                  when nil; 0
+                  when false; -1
+                  when true; 1
+      end
+      
+      EventMachine::set_tls_parms(@signature, priv_key || '', cert_chain || '', verify_peer, ssl_version, cipher_list || '', is_server)
       EventMachine::start_tls @signature
     end
 
