@@ -20,6 +20,10 @@ See the file COPYING for complete licensing information.
 // THIS ENTIRE FILE WILL EVENTUALLY BE FOR UNIX BUILDS ONLY.
 //#ifdef OS_UNIX
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
 #include "project.h"
 
 
@@ -1492,7 +1496,8 @@ struct sockaddr *EventMachine_t::name2address (const char *server, int port, int
 
 	#endif
 	};
-	struct hostent *hp;
+
+	struct addrinfo *ai;
 
 	if (!server || !*server)
 		server = "0.0.0.0";
@@ -1529,16 +1534,22 @@ struct sockaddr *EventMachine_t::name2address (const char *server, int port, int
 	// For the time being, Ipv6 addresses aren't supported on Windows.
 	#endif
 
-	hp = gethostbyname ((char*)server); // Windows requires the cast.
-	if (hp) {
-		in4.sin_addr.s_addr = ((in_addr*)(hp->h_addr))->s_addr;
+	if (getaddrinfo (server, NULL, NULL, &ai) == 0) {
 		if (family)
-			*family = AF_INET;
+			*family = ai->ai_family;
 		if (bind_size)
-			*bind_size = sizeof(in4);
-		in4.sin_family = AF_INET;
-		in4.sin_port = htons (port);
-		return (struct sockaddr*)&in4;
+			*bind_size = ai->ai_addrlen;
+
+		switch (ai->ai_family) {
+			case AF_INET:
+				memcpy(&in4, ai->ai_addr, ai->ai_addrlen);
+				in4.sin_port = htons(port);
+				return (struct sockaddr*)&in4;
+			case AF_INET6:
+				memcpy(&in6, ai->ai_addr, ai->ai_addrlen);
+				in6.sin6_port = htons(port);
+				return (struct sockaddr*)&in6;
+		}
 	}
 
 	return NULL;
